@@ -1,0 +1,155 @@
+import streamlit as st
+import os
+from utils.session import session_setup
+from streamlit_theme import st_theme
+from utils.components import (show_response_count, finish_button, done_button, show_finish_status,
+                              add_reaction_buttons, get_input_and_gen_response, comments)
+def setup():
+    os.environ['country'] = 'Colombia'
+    os.environ['topic'] = 'el control de armas'
+
+    os.environ['intro_temp'] = '0.7'
+    os.environ['intro_top_p'] = '0.9'
+    os.environ['intro_rep_pen'] = '1'
+    os.environ['intro_max_tokens'] = '512'
+
+    os.environ['intro_system_instruction'] = "Responde con una lista de pros y contras sobre el tema en cuestión."
+    os.environ['intro_text'] = f"""Imagina que eres una persona de {os.environ['country']} moderando una discusión sobre {os.environ['topic']}. Basado en los valores culturales de {os.environ['country']}, dale a tu compañero de conversación argumentos sobre por qué una persona promedio de {os.environ['country']} estaría a favor/en contra de {os.environ['topic']}. Debes darle la información en un estilo colloquial en español. Comienza la conversación usando exactamente este mensaje:
+
+    \"Buenas tardes. Seré tu compañero de conversación hoy en una breve discusión sobre {os.environ['topic']}. Esta conversación es una oportunidad para que aprendas sobre {os.environ['topic']}. Quiero animarte a que hables libremente. No se espera que sea un experto. Además, no es necesario llegar a un consenso, no necesitas estar de acuerdo con mis posturas. Mi papel es ayudarte a aprender cómo las personas en {os.environ['country']} perciben los pros y los contras de {os.environ['topic']}.\"
+
+    Luego comporta información culturalmente relevante en una lista de pros y contras.
+
+    Por último, fomenta la conversación terminando con \"Por favor, comienza contándonos algo que te confunda sobre este tema.\"
+    """
+
+    os.environ['gen_temp'] = '0.7'
+    os.environ['gen_top_p'] = '0.9'
+    os.environ['gen_rep_pen'] = '1'
+    os.environ['gen_max_tokens'] = '512'
+    os.environ['gen_system_instruction'] = f"Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
+
+
+def chat_bubble_css():
+    if st.session_state['current_theme'] == "dark":
+        background_color_user = "#027148"
+        background_color_bot = "#434343"
+    else:
+        background_color_user = "#dcf8c6"
+        background_color_bot = "#f1f0f0"
+
+    st.markdown(f"""
+        <style>
+        .chat-container {{
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }}
+        .user-message, .bot-message {{
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 60%;
+            margin: 5px;
+            position: relative;
+            margin-top: 15px;  /* Staggered positioning for each message */
+        }}
+        .user-message {{
+            align-self: flex-end;
+            background-color: {background_color_user};
+        }}
+        .bot-message {{
+            align-self: flex-start;
+            background-color: {background_color_bot};
+        }}
+        </style>
+    """, unsafe_allow_html=True)
+
+
+st.set_page_config(
+    layout='wide',
+    page_title='AI chatbot',
+    page_icon='🤖'
+)
+
+
+def main():
+    setup()
+    session_setup()
+    chat_bubble_css()
+
+    if st.session_state.get('next_page', False):
+        st.session_state.current_page = "feedback"  # Set the current page in session state
+
+    current_page = st.session_state.get('current_page', "chat")
+
+    if current_page == "feedback":
+        show_feedback_page()
+    else:
+        show_chat_page()
+
+
+def show_chat_page():
+    st.title('AI chatbot')
+    introduction = st.session_state['introduction']
+    st.info(introduction)
+
+    # Display chat history
+    for i, exchange in enumerate(st.session_state.get('chat_history', [])):
+        user_message = exchange['user_input']
+        bot_response = exchange['response']
+
+        st.markdown(f"""
+            <div class="chat-container">
+                <div class="user-message">{user_message}</div>
+                <div class="bot-message">{bot_response}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        add_reaction_buttons(i)
+
+    get_input_and_gen_response()
+    show_response_count()
+    finish_button()
+    show_finish_status()
+
+
+def show_feedback_page():
+    st.subheader("Chatbot Responses for Feedback")
+    st.write("""
+    On this page, you can provide feedback on the chatbot's responses.
+    
+    Below, you will see a list of input / response pairs from your chat. Your input is in ***green***, while the 
+    chatbot's response is in ***gray***.
+    
+    To the right of a response, you can click **Yes** under **Give feedback?** if you want to provide feedback on that 
+    response, or you can click **No** if not. 
+    
+    If you choose to provide feedback on a response, you can specify the type by choosing from the categories in the 
+    dropdown menu. You can choose more than one. Then, fill out the comment box with your thoughts on the response.
+    
+    You must provide feedback for at least two responses, at which point a **Submit** button will appear at the bottom
+    of the page.
+    
+    Click **Submit** when you are finished, then click **Go to post-survey** to take the post-survey.
+    """)
+
+    with st.expander("Click to learn what each category means"):
+        st.markdown("""
+        - **Balanced / biased towards certain perspective**: ...
+        - **Morally + ethically sound / morally + ethically questionable**: ...
+        - **Factually incorrect**: ...
+        - **Respectful / disrespectful**: ...
+        - **Culturally relevant / culturally irrelevant**: ...
+        - **Other**: Any other feedback that doesn't fit into the above categories.
+        <br><br>
+        """, unsafe_allow_html=True)
+
+    comments()
+    #done_button()
+
+    if 'done_pressed' in st.session_state and st.session_state['done_pressed']:
+        st.success("Comments submitted! Click **Go to post-survey** to start the post-survey.")
+
+
+if __name__ == '__main__':
+    main()
