@@ -6,8 +6,8 @@ from utils.pages import show_chat_page, show_feedback_page
 
 # configuration
 def setup():
-    os.environ['country'] = 'Colombia'
-    os.environ['topic'] = 'LGBTQ rights'
+    os.environ['country'] = 'Brazil'
+    os.environ['topic'] = 'the death penalty'
 
     os.environ['intro_max_tokens'] = '512'
     os.environ['intro_system_instruction'] = 'Respond with a list of pros and cons on the topic at hand.'
@@ -25,7 +25,6 @@ Lastly, encourage conversation by ending with \"Please start off by telling us s
                                             If you ask a question, you make it open-ended.""")
     os.environ['shorter_system_instruction'] = (f"""You provide shorter, more conversational responses. If you ask a 
                                             question, you make it open-ended.""")
-
     os.environ['chatbot'] = 'AI chatbot'
     os.environ['yes'] = 'Yes'
     os.environ['no'] = 'No'

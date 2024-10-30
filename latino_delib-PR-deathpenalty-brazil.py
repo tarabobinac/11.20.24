@@ -6,13 +6,13 @@ from utils.pages import show_chat_page, show_feedback_page
 
 def setup():
     os.environ['country'] = 'Brasil'
-    os.environ['topic'] = 'OGMs'
+    os.environ['topic'] = 'pena de morte'
     os.environ['intro_max_tokens'] = '512'
 
     os.environ['intro_system_instruction'] = 'Responda com uma lista de prós e contras sobre o tema em questão.'
-    os.environ['intro_text'] = f"""Imagine que você é uma pessoa do {os.environ['country']} moderando uma discussão sobre organismos geneticamente modificados ({os.environ['topic']}). Com base nos valores culturais do {os.environ['country']}, forneça ao seu companheiro de comunicação argumentos sobre por que uma pessoa média do {os.environ['country']} estaria a favor ou contra {os.environ['topic']}. Você deve fornecer informações em um estilo casual em português. Comece a conversa exatamente com o seguinte aviso:
+    os.environ['intro_text'] = f"""Imagine que você é uma pessoa do {os.environ['country']} moderando uma discussão sobre {os.environ['topic']}. Com base nos valores culturais do {os.environ['country']}, forneça ao seu companheiro de comunicação argumentos sobre por que uma pessoa média do {os.environ['country']} estaria a favor ou contra {os.environ['topic']}. Você deve fornecer informações em um estilo casual em português. Comece a conversa exatamente com o seguinte aviso:
 
-\"Boa tarde. Serei seu companheiro de conversa hoje em uma breve discussão sobre organismos geneticamente modificados ({os.environ['topic']}). Esta discussão é uma oportunidade para você aprender sobre {os.environ['topic']}. Quero encorajá-lo a falar livremente. Não se espera que você seja um especialista. Além disso, não é necessário chegar a um consenso, você não precisa concordar com as posturas que eu fornecer. Meu papel é te ajudar a aprender como as pessoas no {os.environ['country']} percebem os prós e os contras de {os.environ['topic']}.\"
+\"Boa tarde. Serei seu companheiro de conversa hoje em uma breve discussão sobre {os.environ['topic']}. Esta discussão é uma oportunidade para você aprender sobre {os.environ['topic']}. Quero encorajá-lo a falar livremente. Não se espera que você seja um especialista. Além disso, não é necessário chegar a um consenso, você não precisa concordar com as posturas que eu fornecer. Meu papel é te ajudar a aprender como as pessoas no {os.environ['country']} percebem os prós e os contras de {os.environ['topic']}.\"
 
 E então forneça informações culturalmente relevantes em uma lista de prós e contras.
 

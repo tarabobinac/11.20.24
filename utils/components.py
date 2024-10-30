@@ -1,93 +1,73 @@
 import streamlit as st
+import os
 from utils.chatbot import get_response
-from utils.session import modify_chat_history
-from streamlit_theme import st_theme
-
+from utils.session import modify_chat_history, get_session_state, set_session_state
+import random
 
 minimum_responses = 5
 warning_responses = 10
 maximum_responses = 15
 
 
+# display value of current round of conversation
 def show_response_count():
-    response_count = st.session_state['response_count']
+    response_count = get_session_state('response_count')
 
     if response_count == 0:
         return
 
-    response_count_message = "You have finished {} round(s) of conversation.".format(
-        response_count)
+    response_count_message = f"{os.getenv('convo_update_1')} {response_count} {os.getenv('convo_update_2')}"
 
-    # Need more responses
     if response_count < warning_responses:
         st.info(response_count_message)
 
-    # Enough but can ask more
     if warning_responses <= response_count < maximum_responses:
+        convo_warning_1 = os.getenv('convo_warning_1')
+        convo_warning_2 = os.getenv('convo_warning_2')
         extra_count = maximum_responses - response_count
-        response_count_message += ' Due to time limit, you can only ask {} more question to the chatbot.'.format(
-            extra_count)
+        response_count_message += f"{convo_warning_1} {extra_count} {convo_warning_2}"
         st.warning(response_count_message)
 
-    # Done
     if maximum_responses <= response_count:
         st.success(response_count_message)
 
 
-def finish_button():
-    response_count = st.session_state['response_count']
+# display done button for comments to responses
+def done_button(submit_button_disabled):
+    if st.button(os.getenv('submit'), disabled=submit_button_disabled or get_session_state('done_pressed')):
+        set_session_state('done_pressed', True)
+        st.rerun()
 
-    if st.session_state['survey_finished']:
-        st.button('Finish Chat', disabled=True)
-        return
-
-    if response_count == maximum_responses:
-        st.session_state['survey_finished'] = True
-
-    if response_count >= minimum_responses:
-        if st.button('Finish Chat'):
-            st.session_state['survey_finished'] = True
-            st.rerun()
+    if get_session_state('done_pressed'):
+        st.success(os.getenv('submitted'))
 
 
-def done_button():
-    if st.session_state['survey_finished']:
-        if st.button('Submit', disabled=st.session_state.get('done_pressed', False)):
-            st.session_state['done_pressed'] = True
-            st.rerun()
-
-
+# show message and next page button if chat conversation is done
 def show_finish_status():
-
-    if not st.session_state['survey_finished']:
+    if get_session_state('survey_finished') is False:
         return
 
-    if st.session_state['next_page']:
-        st.button('Next page', disabled=True)
+    if get_session_state('next_page'):
+        st.button(os.getenv('next_page'), disabled=True)
         return
 
-    st.success(f'''
-      **Chat complete**, thank you for chatting with the chatbot!\n
-      Sometimes, chatbots produce responses that are inaccurate in a few different ways. Press 
-      **Next page** to review the chatbot's responses from this chat and provide feedback on them.
-    ''')
+    st.success(os.getenv('chat_complete'))
 
-    if st.button("Next page"):
-        st.session_state["next_page"] = True
+    if st.button(os.getenv('next_page')):
+        set_session_state('next_page', True)
         st.rerun()
 
 
+# enable reactions for each response
 def add_reaction_buttons(response_index):
-    emojis = ["👍", "👎", "❤️", "😂", "😮", "😢", "😡"]
+    emojis = ["❤️", "😂", "😮", "😢", "😡", "👍", "👎"]
 
-    # Check if it's the latest response
-    is_latest_response = (response_index == len(st.session_state['chat_history']) - 1)
-
-    # Disable reaction buttons for previous responses, enable only for the latest response
+    chat_history_length = len(get_session_state('chat_history'))
+    is_latest_response = (response_index == chat_history_length - 1)
     disabled = not is_latest_response
 
     selected_emoji = st.radio(
-        f"React to response {response_index + 1}:",
+        f"{os.getenv('emoji_prompt')} {response_index + 1}:",
         emojis,
         key=f"reaction_{response_index}",
         index=None,  # No default selection
@@ -95,120 +75,143 @@ def add_reaction_buttons(response_index):
         disabled=disabled
     )
 
-    # Initialize reaction history if not already
-    if 'reaction_history' not in st.session_state:
-        st.session_state['reaction_history'] = []
+    reaction_history = get_session_state('reaction_history')
+    reaction_history_length = len(reaction_history)
+    if reaction_history_length == response_index:
+        reaction_history.append(selected_emoji)
+    elif reaction_history[response_index] != selected_emoji:
+        reaction_history[response_index] = selected_emoji
 
-    # Add selected emoji to the history or update it
-    if len(st.session_state['reaction_history']) == response_index:
-        st.session_state['reaction_history'].append(selected_emoji)
-    elif st.session_state['reaction_history'][response_index] != selected_emoji:
-        st.session_state['reaction_history'][response_index] = selected_emoji
+    set_session_state('reaction_history', reaction_history)
 
-    # If it's the latest response, ensure that the user selects an emoji
     if is_latest_response and selected_emoji is None:
-        st.warning(f"Please select an emoji reaction for response {response_index + 1} to proceed.")
+        st.warning(f"{os.getenv('emoji_warning_1')} {response_index + 1}{os.getenv('emoji_warning_2')}")
         st.stop()
 
 
+# enable feedback to responses functionality
 def comments():
     feedback_enabled_count = 0  # Track how many responses have feedback enabled
     valid_comments_count = 0    # Track how many valid comments (with categories) have been provided
 
-    if st.session_state['current_theme'] == "dark":
-        background_color_user = "#5f6759"
-        background_color_bot = "#434343"
-    else:
-        background_color_user = "#dcf8c6"
-        background_color_bot = "#f1f0f0"
-
-    # Initialize session state for 'done_pressed' if not already done
-    if 'done_pressed' not in st.session_state:
-        st.session_state['done_pressed'] = False
-
-    # Process the responses
-    for i, exchange in enumerate(st.session_state.get('chat_history', [])):
-        st.markdown(f"<h5><b>Response {i + 1}</b></h5>", unsafe_allow_html=True)
-
-        # Create columns for layout
+    for i, exchange in enumerate(get_session_state('chat_history')):
+        st.markdown(f"<h5><b>{os.getenv('response')} {i + 1}</b></h5>", unsafe_allow_html=True)
         col1, col2 = st.columns([3, 2])
 
         with col1:
-            # Add the user's input in a separate colored box above the model's response
             st.markdown(f"""
-                <div style='background-color: {background_color_user}; padding: 10px; border-radius: 10px; margin-bottom: 10px;'>
-                    <strong>User:</strong> {exchange['user_input']}
+                <div style='background-color: {get_session_state('background_color_user')}; padding: 10px; border-radius: 10px; margin-bottom: 10px;'>
+                    <strong>{os.getenv('user')}:</strong> {exchange['user_input']}
                 </div>
             """, unsafe_allow_html=True)
 
             # Add the model's response in a text box below the user's input
             st.markdown(f"""
-                <div style='background-color: {background_color_bot}; padding: 10px; border-radius: 15px; margin-bottom: 10px;
+                <div style='background-color: {get_session_state('background_color_bot')}; padding: 10px; border-radius: 15px; margin-bottom: 10px;
                 min-height: 243px; display: block;'>
-                    <strong>Response:</strong> {exchange['response']}
+                    <strong>{os.getenv('response')}:</strong> {exchange['response']}
                 </div>
             """, unsafe_allow_html=True)
 
         with col2:
-            # Disable buttons and inputs if submit has been pressed
-            feedback_option = st.radio("Give feedback?", ["No", "Yes"], index=0, key=f"feedback_{i}",
-                                       horizontal=True, disabled=st.session_state['done_pressed'])
+            feedback_option = st.radio(os.getenv('give_feedback'), [os.getenv('no'), os.getenv('yes')], index=0, key=f"feedback_{i}",
+                                       horizontal=True, disabled=get_session_state('done_pressed'))
 
-            if feedback_option == "Yes":
+            if feedback_option == os.getenv('yes'):
                 feedback_enabled_count += 1
 
             categories = st.multiselect(
-                f"Categories for Response {i + 1}",
+                f"{os.getenv('categories_for_response')} {i + 1}",
                 ["Balanced / biased towards certain perspective",
                  "Morally + ethically sound / morally + ethically questionable", "Factually incorrect",
                  "Respectful / disrespectful", "Culturally relevant / culturally irrelevant", "Other"],
                 key=f"categories_{i}",
-                disabled=feedback_option != "Yes" or st.session_state['done_pressed']
+                placeholder=os.getenv('options'),
+                disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')
             )
 
-            # Comment text box for feedback
-            comment = st.text_area(f"Comment for Response {i + 1}", key=f'comment_{i}',
-                                   disabled=feedback_option != "Yes" or st.session_state['done_pressed'],
-                                   placeholder="Add your comment here")
+            comment = st.text_area(f"{os.getenv('comments')} {i + 1}", key=f'comment_{i}',
+                                   disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed'),
+                                   placeholder=os.getenv('comment_prompt'))
 
-            # Check if a valid comment and category selection are provided for this response
-            if feedback_option == "Yes" and comment.strip() and categories:
+            if feedback_option == os.getenv('yes') and comment.strip() and categories:
                 valid_comments_count += 1
 
-    # Enforce at least two responses with valid feedback (comment and category) enabled
     submit_button_disabled = valid_comments_count < 2
-
-    if st.session_state['survey_finished'] and not submit_button_disabled:
-        if st.button('Submit', disabled=st.session_state.get('done_pressed', False)):
-            st.session_state['done_pressed'] = True
-            st.rerun()
+    done_button(submit_button_disabled)
 
 
-
+# accept or decline user input
 def submit_user_input():
-    if st.session_state['survey_finished']:
-        st.text_input('You:', value='', key=str(st.session_state['response_count']), disabled=True)
+    if get_session_state('survey_finished'):
+        st.text_input(os.getenv('you') + ':', value='', placeholder=os.getenv('enter'), key=str(get_session_state('response_count')), disabled=True)
         return None
     else:
-        return st.text_input('You:', value='', key=str(st.session_state['response_count']))
+        return st.text_input(os.getenv('you') + ':', value='', placeholder=os.getenv('enter'), key=str(get_session_state('response_count')))
 
+
+# get input from the user and generate a response
 def get_input_and_gen_response():
-    if not st.session_state['submitted_input']:
+    if not get_session_state('submitted_input'):
         user_input = submit_user_input()
         if user_input:
-            st.session_state['user_input'] = user_input
-            st.session_state['submitted_input'] = True
+            set_session_state('user_input', user_input)
+            set_session_state('submitted_input', True)
             st.rerun()
 
     else:
         st.markdown(f"""
             <div class="chat-container">
-                <div class="user-message">{st.session_state['user_input']}</div>
+                <div class="user-message">{get_session_state('user_input')}</div>
             </div>
         """, unsafe_allow_html=True)
-        response = get_response(st.session_state['user_input'])
-        st.session_state['submitted_input'] = False
-        if response:
-            modify_chat_history(st.session_state['user_input'], response)
-            st.session_state['response_count'] += 1
-            st.rerun()
+
+        instruction = random.randint(0, 1)
+
+        if instruction == 0:
+            system_instruction = get_session_state('system_instruction')
+        else:
+            system_instruction = get_session_state('shorter_system_instruction')
+
+        set_session_state('response_placeholder', st.empty())
+        set_session_state('stream_text', '')
+
+        get_response(get_session_state('user_input'), system_instruction, text_received)
+
+        set_session_state('submitted_input', False)
+        modify_chat_history(get_session_state('user_input'), get_session_state('stream_text'), system_instruction)
+
+        response_count = get_session_state('response_count')
+        response_count += 1
+        set_session_state('response_count', response_count)
+        st.rerun()
+
+
+# get text stream response and draw the response box
+def text_received(text):
+    if text:
+        stream_text = get_session_state('stream_text')
+        stream_text += text
+        set_session_state('stream_text', stream_text)
+
+        get_session_state('response_placeholder').markdown(
+            f"<div class='bot-message'>{get_session_state('stream_text')}</div>",
+            unsafe_allow_html=True
+        )
+    else:
+        get_session_state('response_placeholder').markdown(
+            f"<div class='bot-message'>{get_session_state('stream_text')}</div>",
+            unsafe_allow_html=True
+        )
+    return
+
+def finish_button():
+    response_count = get_session_state('response_count')
+    if get_session_state('survey_finished'):
+        st.button(os.getenv('finish_chat'), disabled=True)
+        return
+    if response_count == maximum_responses:
+        set_session_state('survey_finished', True)
+    if st.button(os.getenv('finish_chat'), disabled=response_count < minimum_responses):
+        set_session_state('survey_finished', True)
+        st.rerun()

@@ -6,7 +6,7 @@ from utils.pages import show_chat_page, show_feedback_page
 
 def setup():
     os.environ['country'] = 'Colombia'
-    os.environ['topic'] = 'el aborto'
+    os.environ['topic'] = 'la pena de muerte'
     os.environ['intro_max_tokens'] = '512'
 
     os.environ['intro_system_instruction'] = "Responde con una lista de pros y contras sobre el tema en cuestión."
@@ -23,10 +23,16 @@ Por último, fomenta la conversación terminando con \"Por favor, comienza cont�
     os.environ['gen_system_instruction'] = (f"""Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
                                             Si hace una pregunta, hace pregunta abierta.""")
     os.environ['shorter_system_instruction'] = "Proporciona respuestas más breves y casuales. Si hace una pregunta, hace pregunta abierta."
+    os.environ['gen_max_tokens'] = '512'
+    os.environ['gen_system_instruction'] = (f"""Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
+                                                Si hace una pregunta, hace pregunta abierta.""")
+    os.environ[
+        'shorter_system_instruction'] = "Proporciona respuestas más breves y casuales. Si hace una pregunta, hace pregunta abierta."
     os.environ['chatbot'] = 'Chatbot de IA'
     os.environ['yes'] = 'Sí'
     os.environ['no'] = 'No'
-    os.environ['convo_limit'] = 'Debe completar al menos 5 rondas de conversación, pero puede seguir y completar hasta el máximo de 15.'
+    os.environ[
+        'convo_limit'] = 'Debe completar al menos 5 rondas de conversación, pero puede seguir y completar hasta el máximo de 15.'
     os.environ['intro_wait'] = 'Iniciando chatbot, esto puede tardar hasta 20 segundos...'
     os.environ['react_intro'] = 'Reacción a la introducción:'
     os.environ['intro_emoji'] = 'Select an emoji to continue chatting.'
@@ -45,7 +51,8 @@ Por último, fomenta la conversación terminando con \"Por favor, comienza cont�
     os.environ['options'] = 'Elija una opción'
     os.environ['comment_prompt'] = 'Agregue su comentario aquí'
     os.environ['submit'] = 'Enviar'
-    os.environ['submitted'] = '¡Comentarios enviados! Haga clic en **Ir a la encuesta posterior** para comenzar la encuesta posterior.'
+    os.environ[
+        'submitted'] = '¡Comentarios enviados! Haga clic en **Ir a la encuesta posterior** para comenzar la encuesta posterior.'
 
     os.environ['emoji_warning_1'] = 'Para continuar, por favor seleccione un emoji para la respuesta '
     os.environ['emoji_warning_2'] = '.'
@@ -56,19 +63,18 @@ Por último, fomenta la conversación terminando con \"Por favor, comienza cont�
     os.environ[
         'chat_complete'] = "**Chat finalizado.** ¡Gracias por interactuar con el chatbot! A veces, los chatbots generan respuestas inexactas. Presione **Siguiente página** para revisar las respuestas del chatbot y proporcionar comentarios sobre ellas."
     os.environ['comment_outline'] = """
-            En esta página, puede proporcionar comentarios sobre las respuestas del chatbot.
+                En esta página, puede proporcionar comentarios sobre las respuestas del chatbot.
 
-            A continuación, verá una lista de pares de entrada/respuesta de su chat. Su entrada está en ***verde*** y la respuesta del chatbot está en ***gris***.
+                A continuación, verá una lista de pares de entrada/respuesta de su chat. Su entrada está en ***verde*** y la respuesta del chatbot está en ***gris***.
 
-            A la derecha de cada respuesta, puede indicar si desea o no hacer comentarios. 
+                A la derecha de cada respuesta, puede indicar si desea o no hacer comentarios. 
 
-            Si desea hacer comentarios sobre una respuesta, puede especificar el tipo de comentarios eligiendo entre las categorías del menú desplegable. Puede elegir más de un tipo de comentario. Luego, complete la casilla de comentarios con su opinión sobre la respuesta.
+                Si desea hacer comentarios sobre una respuesta, puede especificar el tipo de comentarios eligiendo entre las categorías del menú desplegable. Puede elegir más de un tipo de comentario. Luego, complete la casilla de comentarios con su opinión sobre la respuesta.
 
-            Debe proporcionar comentarios para al menos dos respuestas del chatbot. Luego de completar el mínimo de dos respuestas, el botón **Enviar** estará habilitado. 
+                Debe proporcionar comentarios para al menos dos respuestas del chatbot. Luego de completar el mínimo de dos respuestas, el botón **Enviar** estará habilitado. 
 
-            Haga clic en **Enviar** cuando haya terminado, luego haga clic en **Ir a la encuesta posterior** para realizar la encuesta posterior.
-            """
-
+                Haga clic en **Enviar** cuando haya terminado, luego haga clic en **Ir a la encuesta posterior** para realizar la encuesta posterior.
+                """
 
 # style
 def chat_bubble_css():

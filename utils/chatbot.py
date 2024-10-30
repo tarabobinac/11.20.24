@@ -1,6 +1,8 @@
 import streamlit as st
+from utils.session import set_session_state, get_session_state
 import requests
 import os
+import json
 
 minimum_responses = 1
 warning_responses = 10
@@ -14,43 +16,23 @@ headers = {
     "Authorization": f"Bearer {DEEPINFRA_TOKEN}"
 }
 
-def intro_response():
-    data = {
-        "model": "meta-llama/Meta-Llama-3.1-70B-Instruct",
-        "messages": [
-            {
-                "role": "system",
-                "content": os.getenv("intro_system_instruction")
-            },
-            {
-                "role": "user",
-                "content": os.getenv("intro_text") + " " + st.session_state['system_instruction']
-            }
-        ],
-        "temperature": os.getenv("intro_temp"),
-        "top_p": os.getenv("intro_top_p"),
-        "repetition_penalty": os.getenv("intro_rep_pen"),
-        "max_tokens": os.getenv("intro_max_tokens")
-    }
-    response = requests.post(url, headers=headers, json=data)
-    #print(response.json()['usage']['estimated_cost'])
-    return response.json()['choices'][0]['message']['content']
 
-
-def request_response(user_input):
+# communicate with API for stream response
+def request_response(user_input, system_instruction, callback):
     if os.getenv("intro_system_instruction") == "":
-        messages = [{"role": "assistant", "content": st.session_state["introduction"]}]
+        messages = [{"role": "assistant", "content": get_session_state('introduction')}]
     else:
         messages = [{"role": "system", "content": os.getenv("intro_system_instruction")},
                     {"role": "user", "content": os.getenv("intro_text")},
-                    {"role": "assistant", "content": st.session_state["introduction"]}]
+                    {"role": "assistant", "content": get_session_state('introduction')}]
 
-    for IO_pair in st.session_state['chat_history']:
+    chat_history = get_session_state('chat_history')
+    for IO_pair in chat_history:
         messages.extend(
             [
                 {
                     "role": "system",
-                    "content": st.session_state['system_instruction'],
+                    "content": IO_pair['system_instruction'],
                 },
                 {
                     "role": "user",
@@ -67,51 +49,43 @@ def request_response(user_input):
         [
             {
                 "role": "system",
-                "content": st.session_state['system_instruction'],
+                "content": system_instruction,
             },
             {
                 "role": "user",
-                "content": user_input + " " + st.session_state['system_instruction'],
+                "content": user_input + " " + get_session_state('system_instruction'),
             }
         ]
     )
 
-    print(messages)
-
     data = {
         "model": "meta-llama/Meta-Llama-3.1-70B-Instruct",
         "messages": messages,
-        "temperature": os.getenv("gen_temp"),
-        "top_p": os.getenv("gen_top_p"),
-        "repetition_penalty": os.getenv("gen_rep_pen"),
+        "temperature": 0.7,
+        "stream": "true",
+        "top_p": 0.9,
+        "repetition_penalty": 1,
         "max_tokens": os.getenv("gen_max_tokens")
     }
 
-    response = requests.post(url, headers=headers, json=data)
-    #print(response.json()['usage']['estimated_cost'])
-    return response.json()['choices'][0]['message']['content']
+    response = requests.post(url, headers=headers, json=data, stream=True)
+    for line in response.iter_lines():
+        if line:
+            stop = json.loads(line.decode("utf-8").strip("data: "))["choices"][0]["finish_reason"]
+            if stop is None:
+                text = json.loads(line.decode("utf-8").strip("data: "))["choices"][0]["delta"]["content"]
+                callback(text)
+            else:
+                callback(None)
+                break
 
 
-def get_response(user_input):
-    # User input is empty
-    if user_input == '':
+# filter input before requesting from API
+def get_response(user_input, system_instruction, callback):
+    if get_session_state('response_count') >= maximum_responses:
         return None
 
-    # The response count has reached the maximum responses
-    if st.session_state['response_count'] >= maximum_responses:
+    if get_session_state('survey_finished'):
         return None
 
-    # The survey has been finished
-    if st.session_state['survey_finished']:
-        return None
-
-    # Preliminary hello input
-    #if user_input in ['Hello', 'hello', 'Hello!', 'Hi', 'hi', 'HI', 'Hi!']:
-    #    return 'Hello! I am the chatbot. What can I do for you today?'
-
-    # Show the spinner while waiting for the response
-    with st.spinner('Waiting for the chatbot to respond... This can take 10-15 seconds.'):
-        response = request_response(user_input)
-
-    return response
-
+    request_response(user_input, system_instruction, callback)
