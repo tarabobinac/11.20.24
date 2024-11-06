@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from utils.session import session_setup, get_session_state, set_session_state
 from utils.pages import show_chat_page, show_feedback_page
-
+from utils.EN_labels import set_labels
 
 # configuration
 def setup():
@@ -13,7 +13,7 @@ def setup():
     os.environ['intro_system_instruction'] = 'Respond with a list of pros and cons on the topic at hand.'
     os.environ['intro_text'] = f"""Imagine you are a person from {os.environ['country']} moderating a discussion about genetically modified organisms ({os.environ['topic']}). Based on the cultural values from {os.environ['country']}, provide your communication partner with stances why an average person from {os.environ['country']} would be pro/against {os.environ['topic']}. You should provide information in a casual style in English. Start the conversation with exactly the following prompt: 
 
-\"Good afternoon. I will be your conversation partner today in a brief discussion about genetically modified organisms ({os.environ['topic']}). This discussion is an opportunity for you to learn about {os.environ['topic']}. I want to encourage you to speak freely. You are not expected to be an expert. Also, no consensus is necessary, you do not need to agree with the stances I provide. My role is to help you learn about how people in {os.environ['country']} perceive the pros and cons of {os.environ['topic']}.\" 
+\"Good afternoon. I will be your conversation partner today in a brief discussion about genetically modified organisms ({os.environ['topic']}). This discussion is an opportunity for you to learn about {os.environ['topic']} in {os.environ['country']}. I want to encourage you to speak freely. You are not expected to be an expert. Also, no consensus is necessary, you do not need to agree with the stances I provide. My role is to help you learn about how people in {os.environ['country']} perceive the pros and cons of {os.environ['topic']}.\" 
 
 And then provide relevant cultural information in a pros/cons list. 
 
@@ -22,10 +22,9 @@ Lastly, encourage conversation by ending with \"Please start off by telling us s
 
     os.environ['gen_max_tokens'] = '512'
     os.environ['gen_system_instruction'] = (f"""You finish your response within {os.environ['gen_max_tokens']} tokens.
-                                            If you ask a question, you make it open-ended.""")
-    os.environ['shorter_system_instruction'] = (f"""You provide shorter, more conversational responses. If you ask a 
-                                            question, you make it open-ended.""")
-
+                                            Avoid asking \"yes\"/\"no\" questions.""")
+    os.environ['shorter_system_instruction'] = (f"""You provide shorter, more conversational responses. 
+                                            Avoid asking \"yes\"/\"no\" questions.""")
 
 # style
 def chat_bubble_css():
@@ -65,6 +64,7 @@ st.set_page_config(
 
 # start session and display chat or response page
 def main():
+    set_labels()
     setup()
     session_setup()
     chat_bubble_css()

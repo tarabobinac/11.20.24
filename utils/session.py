@@ -13,26 +13,12 @@ headers = {
     "Authorization": f"Bearer {DEEPINFRA_TOKEN}"
 }
 
-# generate a 10 characters ID of pattern:
-#   0     1     2     3     4     5     6     7     8     9
-# [0-9] [0-9] [A-Z] [A-Z] [A-Z] [0-9] [0-9] [A-Z] [0-9] [A-Z]
-def get_survey_id():
-    survey_id = ''
-    survey_id = survey_id + str(random.randint(0, 9))
-    survey_id = survey_id + str(random.randint(0, 9))
-    survey_id = survey_id + random.choice(string.ascii_letters)
-    survey_id = survey_id + random.choice(string.ascii_letters)
-    survey_id = survey_id + random.choice(string.ascii_letters)
-    survey_id = survey_id + str(random.randint(0, 9))
-    survey_id = survey_id + str(random.randint(0, 9))
-    survey_id = survey_id + random.choice(string.ascii_letters)
-    survey_id = survey_id + str(random.randint(0, 9))
-    survey_id = survey_id + random.choice(string.ascii_letters)
-    return survey_id
-
 
 # set up the state of this streamlit app session
 def session_setup():
+    if get_session_state('respondent_id') is None:
+        set_session_state('respondent_id', st.experimental_get_query_params().get("respondent_id", [""])[0])
+
     if get_session_state('chat_history') is None:
         set_session_state('chat_history', [])
 
@@ -62,9 +48,6 @@ def session_setup():
             set_session_state('background_color_bot', '#434343')
         else:
             set_session_state('background_color_bot', '#f1f0f0')
-
-    if get_session_state('survey_id') is None:
-        set_session_state('survey_id', get_survey_id())
 
     if get_session_state('survey_finished') is None:
         set_session_state('survey_finished', False)
@@ -100,11 +83,11 @@ def session_setup():
     if get_session_state('stream_text') is None:
         set_session_state('stream_text', '')
 
-    if get_session_state('streaming') is None:
-        set_session_state('streaming', False)
-
     if get_session_state('done_pressed') is None:
         set_session_state('done_pressed', False)
+
+    if get_session_state('comments') is None:
+        set_session_state('comments', [])
 
     if get_session_state('response_placeholder') is None:
         set_session_state('response_placeholder', st.empty())

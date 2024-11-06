@@ -1,7 +1,9 @@
+
 import streamlit as st
 import os
 from utils.chatbot import get_response
 from utils.session import modify_chat_history, get_session_state, set_session_state
+from utils.database import handle_submission
 import random
 
 minimum_responses = 5
@@ -36,6 +38,7 @@ def show_response_count():
 def done_button(submit_button_disabled):
     if st.button(os.getenv('submit'), disabled=submit_button_disabled or get_session_state('done_pressed')):
         set_session_state('done_pressed', True)
+        handle_submission()
         st.rerun()
 
     if get_session_state('done_pressed'):
@@ -94,6 +97,12 @@ def comments():
     feedback_enabled_count = 0  # Track how many responses have feedback enabled
     valid_comments_count = 0    # Track how many valid comments (with categories) have been provided
 
+    if get_session_state('comments') == []:
+        comment_storage = [{'feedback': 'no', 'categories': [], 'comment': ''} for _ in range(len(get_session_state('chat_history')))]
+        set_session_state('comments', comment_storage)
+
+    comment_storage = get_session_state('comments')
+
     for i, exchange in enumerate(get_session_state('chat_history')):
         st.markdown(f"<h5><b>{os.getenv('response')} {i + 1}</b></h5>", unsafe_allow_html=True)
         col1, col2 = st.columns([3, 2])
@@ -105,7 +114,6 @@ def comments():
                 </div>
             """, unsafe_allow_html=True)
 
-            # Add the model's response in a text box below the user's input
             st.markdown(f"""
                 <div style='background-color: {get_session_state('background_color_bot')}; padding: 10px; border-radius: 15px; margin-bottom: 10px;
                 min-height: 243px; display: block;'>
@@ -119,6 +127,9 @@ def comments():
 
             if feedback_option == os.getenv('yes'):
                 feedback_enabled_count += 1
+                comment_storage[i]['feedback'] = 'yes'
+            else:
+                comment_storage[i]['feedback'] = 'no'
 
             categories = st.multiselect(
                 f"{os.getenv('categories_for_response')} {i + 1}",
@@ -129,16 +140,22 @@ def comments():
                 placeholder=os.getenv('options'),
                 disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')
             )
+            comment_storage[i]['categories'] = categories
 
             comment = st.text_area(f"{os.getenv('comments')} {i + 1}", key=f'comment_{i}',
                                    disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed'),
                                    placeholder=os.getenv('comment_prompt'))
+            comment_storage[i]['comment'] = comment
 
             if feedback_option == os.getenv('yes') and comment.strip() and categories:
                 valid_comments_count += 1
 
+    # Update 'comments' session state with the modified comment storage
+    set_session_state('comments', comment_storage)
+
     submit_button_disabled = valid_comments_count < 2
     done_button(submit_button_disabled)
+
 
 
 # accept or decline user input
@@ -212,6 +229,7 @@ def finish_button():
         return
     if response_count == maximum_responses:
         set_session_state('survey_finished', True)
-    if st.button(os.getenv('finish_chat'), disabled=response_count < minimum_responses):
-        set_session_state('survey_finished', True)
-        st.rerun()
+    if response_count >= minimum_responses:
+        if st.button(os.getenv('finish_chat')):
+            set_session_state('survey_finished', True)
+            st.rerun()

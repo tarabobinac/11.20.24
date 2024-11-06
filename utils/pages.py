@@ -1,9 +1,9 @@
+
 import os
 import streamlit as st
 from utils.components import (add_reaction_buttons, get_input_and_gen_response, show_response_count,
-                              finish_button, show_finish_status, comments)
+                              finish_button, show_finish_status, comments, submit_user_input)
 from utils.session import get_session_state, set_session_state
-
 
 def show_chat_page():
     st.title(os.getenv('chatbot'))

@@ -2,7 +2,7 @@ import streamlit as st
 import os
 from utils.session import session_setup, get_session_state, set_session_state
 from utils.pages import show_chat_page, show_feedback_page
-
+from utils.ES_labels import set_labels
 
 def setup():
     os.environ['country'] = 'Nicaragua'
@@ -10,71 +10,20 @@ def setup():
     os.environ['intro_max_tokens'] = '512'
 
     os.environ['intro_system_instruction'] = "Responde con una lista de pros y contras sobre el tema en cuestión."
-    os.environ['intro_text'] = f"""Imagina que eres una persona de {os.environ['country']} moderando una discusión sobre {os.environ['topic']}. Basado en los valores culturales de {os.environ['country']}, dale a tu compañero de conversación argumentos sobre por qué una persona promedio de {os.environ['country']} estaría a favor/en contra de {os.environ['topic']}. Debes darle la información en un estilo colloquial en español. Comienza la conversación usando exactamente este mensaje:
+    os.environ['intro_text'] = f'''Imagine que es una persona de {os.environ['country']} moderando una discusión sobre {os.environ['topic']}. Basado en los valores culturales de {os.environ['country']}, dele a su compañero de conversación argumentos sobre por qué una persona promedio de {os.environ['country']} estaría a favor/en contra de {os.environ['topic']}. Debe darle la información en un estilo coloquial en español. Comience la conversación usando exactamente este mensaje:
 
-\"Buenas tardes. Seré tu compañero de conversación hoy en una breve discusión sobre {os.environ['topic']}. Esta conversación es una oportunidad para que aprendas sobre {os.environ['topic']}. Quiero animarte a que hables libremente. No se espera que sea un experto. Además, no es necesario llegar a un consenso, no necesitas estar de acuerdo con mis posturas. Mi papel es ayudarte a aprender cómo las personas en {os.environ['country']} perciben los pros y los contras de {os.environ['topic']}.\"
+"Buenas tardes. Seré su compañero de conversación hoy en una breve discusión sobre {os.environ['topic']}. Esta conversación es una oportunidad para que aprenda sobre {os.environ['topic']} en {os.environ['country']}. Quiero animarle a que hable libremente. No se espera que sea un experto. Además, no es necesario llegar a un consenso, no necesita estar de acuerdo con mis posturas. Mi papel es ayudarle a aprender cómo las personas en {os.environ['country']} perciben los pros y los contras de {os.environ['topic']}."
 
-Luego comporta información culturalmente relevante en una lista de pros y contras.
+Luego comporte información culturalmente relevante en una lista de pros y contras.
 
-Por último, fomenta la conversación terminando con \"Por favor, comienza contándonos algo que encuentres controversial sobre este tema\". 
-"""
+Por último, fomente la conversación terminando con "Por favor, comience contándonos algo que encuentre controversial sobre este tema". 
+'''
 
     os.environ['gen_max_tokens'] = '512'
     os.environ['gen_system_instruction'] = (f"""Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
-                                            Si hace una pregunta, hace pregunta abierta.""")
-    os.environ['shorter_system_instruction'] = "Proporciona respuestas más breves y casuales. Si hace una pregunta, hace pregunta abierta."
-    os.environ['gen_max_tokens'] = '512'
-    os.environ['gen_system_instruction'] = (f"""Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
-                                                Si hace una pregunta, hace pregunta abierta.""")
+                                                Evite preguntas de \"sí\"/\"no\".""")
     os.environ[
-        'shorter_system_instruction'] = "Proporciona respuestas más breves y casuales. Si hace una pregunta, hace pregunta abierta."
-    os.environ['chatbot'] = 'Chatbot de IA'
-    os.environ['yes'] = 'Sí'
-    os.environ['no'] = 'No'
-    os.environ[
-        'convo_limit'] = 'Debe completar al menos 5 rondas de conversación, pero puede seguir y completar hasta el máximo de 15.'
-    os.environ['intro_wait'] = 'Iniciando chatbot, esto puede tardar hasta 20 segundos...'
-    os.environ['react_intro'] = 'Reacción a la introducción:'
-    os.environ['intro_emoji'] = 'Select an emoji to continue chatting.'
-    os.environ['you'] = 'Usted'
-    os.environ['enter'] = 'Presione Enter para enviar'
-    os.environ['emoji_prompt'] = 'Reaccione a la respuesta'
-    os.environ['finish_chat'] = 'Finalizar chat'
-    os.environ['next_page'] = 'Siguiente página'
-    os.environ['feedback_page'] = 'Respuestas del chatbot para comentarios'
-    os.environ['categories'] = 'Haga clic para saber lo que significa cada categoría'
-    os.environ['response'] = 'Respuesta'
-    os.environ['user'] = 'Usuario'
-    os.environ['give_feedback'] = '¿Hacer comentarios?'
-    os.environ['categories_for_response'] = 'Categorías para la respuesta'
-    os.environ['comments'] = 'Comentario para la respuesta'
-    os.environ['options'] = 'Elija una opción'
-    os.environ['comment_prompt'] = 'Agregue su comentario aquí'
-    os.environ['submit'] = 'Enviar'
-    os.environ[
-        'submitted'] = '¡Comentarios enviados! Haga clic en **Ir a la encuesta posterior** para comenzar la encuesta posterior.'
-
-    os.environ['emoji_warning_1'] = 'Para continuar, por favor seleccione un emoji para la respuesta '
-    os.environ['emoji_warning_2'] = '.'
-    os.environ['convo_update_1'] = 'Ha terminado'
-    os.environ['convo_update_2'] = 'ronda(s) de conversación.'
-    os.environ['convo_warning_1'] = 'Solo puede hacerle'
-    os.environ['convo_warning_2'] = 'pregunta(s) más al chatbot.'
-    os.environ[
-        'chat_complete'] = "**Chat finalizado.** ¡Gracias por interactuar con el chatbot! A veces, los chatbots generan respuestas inexactas. Presione **Siguiente página** para revisar las respuestas del chatbot y proporcionar comentarios sobre ellas."
-    os.environ['comment_outline'] = """
-                En esta página, puede proporcionar comentarios sobre las respuestas del chatbot.
-
-                A continuación, verá una lista de pares de entrada/respuesta de su chat. Su entrada está en ***verde*** y la respuesta del chatbot está en ***gris***.
-
-                A la derecha de cada respuesta, puede indicar si desea o no hacer comentarios. 
-
-                Si desea hacer comentarios sobre una respuesta, puede especificar el tipo de comentarios eligiendo entre las categorías del menú desplegable. Puede elegir más de un tipo de comentario. Luego, complete la casilla de comentarios con su opinión sobre la respuesta.
-
-                Debe proporcionar comentarios para al menos dos respuestas del chatbot. Luego de completar el mínimo de dos respuestas, el botón **Enviar** estará habilitado. 
-
-                Haga clic en **Enviar** cuando haya terminado, luego haga clic en **Ir a la encuesta posterior** para realizar la encuesta posterior.
-                """
+        'shorter_system_instruction'] = "Proporciona respuestas más breves y casuales. Evite preguntas de \"sí\"/\"no\"."
 
 # style
 def chat_bubble_css():
@@ -114,6 +63,7 @@ st.set_page_config(
 
 # start session and display chat or response page
 def main():
+    set_labels()
     setup()
     session_setup()
     chat_bubble_css()
