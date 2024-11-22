@@ -5,6 +5,7 @@ from utils.pages import show_chat_page, show_feedback_page
 from utils.PR_labels import set_labels
 
 def setup():
+    os.environ['country'] = ''
     os.environ['topic'] = 'o aborto'
     os.environ['intro_max_tokens'] = '512'
 
@@ -12,9 +13,10 @@ def setup():
     os.environ['intro_text'] = f"""Vamos falar sobre {os.environ['topic']}! Comece nos contando algo que te confunde sobre {os.environ['topic']}."""
 
     os.environ['gen_max_tokens'] = '512'
-    os.environ['gen_system_instruction'] = (f"""Participe de conversas que convidem a expressar opiniões. Termine a sua resposta dentro de {os.environ['gen_max_tokens']} tokens.
+    os.environ['gen_system_instruction'] = (f"""Participe de conversas teimosas e carregadas de opiniões sobre {os.environ['topic']}. Termine a sua resposta dentro de {os.environ['gen_max_tokens']} tokens.
                                             Evite perguntas de \"sim\"/\"não\".""")
-    os.environ['shorter_system_instruction'] = 'Participe de conversas que convidem a expressar opiniões. Use respostas curtas e casuais. Evite perguntas de \"sim\"/\"não\".'
+    os.environ['shorter_system_instruction'] = f'''Participe de conversas teimosas e carregadas de opiniões sobre {os.environ['topic']}. Use respostas curtas e casuais. Evite perguntas de \"sim\"/\"não\".'''
+    os.environ['post_survey'] = 'https://uwmadison.co1.qualtrics.com/jfe/form/SV_4JwGwDzYgW6DTzU'
 
 # style
 def chat_bubble_css():

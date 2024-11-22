@@ -6,7 +6,7 @@ from utils.session import modify_chat_history, get_session_state, set_session_st
 from utils.database import handle_submission
 import random
 
-minimum_responses = 5
+minimum_responses = 10
 warning_responses = 10
 maximum_responses = 15
 
@@ -44,6 +44,30 @@ def done_button(submit_button_disabled):
     if get_session_state('done_pressed'):
         st.success(os.getenv('submitted'))
 
+        # Display "Go to Post Survey" button after submission
+        st.markdown(
+            """
+            <style>
+                .survey-button {
+                    display: flex;
+                    justify-content: flex-start;  /* Align button to the left */
+                    align-items: center;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+
+        link = os.getenv('post_survey') + '?ID=' + get_session_state('respondent_id')
+        st.markdown(
+            f"""
+            <div class="survey-button">
+                <a href="{link}" target="_blank">
+                    <button style="padding: 10px 20px; font-size: 16px; background-color: #027148; color: #f1f0f0; border: none; border-radius: 5px; cursor: pointer;">
+                        Go to Post Survey
+                    </button>
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
+
 
 # show message and next page button if chat conversation is done
 def show_finish_status():
@@ -63,7 +87,7 @@ def show_finish_status():
 
 # enable reactions for each response
 def add_reaction_buttons(response_index):
-    emojis = ["❤️", "😂", "😮", "😢", "😡", "👍", "👎"]
+    emojis = ["😄", "🙂", "😐", "🙁", "😡"]
 
     chat_history_length = len(get_session_state('chat_history'))
     is_latest_response = (response_index == chat_history_length - 1)
@@ -98,7 +122,7 @@ def comments():
     valid_comments_count = 0    # Track how many valid comments (with categories) have been provided
 
     if get_session_state('comments') == []:
-        comment_storage = [{'feedback': 'no', 'categories': [], 'comment': ''} for _ in range(len(get_session_state('chat_history')))]
+        comment_storage = [{'feedback': 'no', 'categories': [], 'other_categories': [], 'comment': ''} for _ in range(len(get_session_state('chat_history')))]
         set_session_state('comments', comment_storage)
 
     comment_storage = get_session_state('comments')
@@ -116,13 +140,14 @@ def comments():
 
             st.markdown(f"""
                 <div style='background-color: {get_session_state('background_color_bot')}; padding: 10px; border-radius: 15px; margin-bottom: 10px;
-                min-height: 243px; display: block;'>
+                min-height: 298px; display: block;'>
                     <strong>{os.getenv('response')}:</strong> {exchange['response']}
                 </div>
             """, unsafe_allow_html=True)
 
         with col2:
-            feedback_option = st.radio(os.getenv('give_feedback'), [os.getenv('no'), os.getenv('yes')], index=0, key=f"feedback_{i}",
+            feedback_option = st.radio(os.getenv('give_feedback'), [os.getenv('no'), os.getenv('yes')], index=0,
+                                       key=f"feedback_{i}",
                                        horizontal=True, disabled=get_session_state('done_pressed'))
 
             if feedback_option == os.getenv('yes'):
@@ -133,21 +158,62 @@ def comments():
 
             categories = st.multiselect(
                 f"{os.getenv('categories_for_response')} {i + 1}",
-                ["Balanced / biased towards certain perspective",
-                 "Morally + ethically sound / morally + ethically questionable", "Factually incorrect",
-                 "Respectful / disrespectful", "Culturally relevant / culturally irrelevant", "Other"],
+                [os.getenv('category_1'), os.getenv('category_2'), os.getenv('category_3'), os.getenv('category_4'),
+                 os.getenv('category_5'), os.getenv('category_6'), os.getenv('category_7'), os.getenv('category_8'),
+                 os.getenv('category_9')],
                 key=f"categories_{i}",
                 placeholder=os.getenv('options'),
                 disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')
             )
             comment_storage[i]['categories'] = categories
 
-            comment = st.text_area(f"{os.getenv('comments')} {i + 1}", key=f'comment_{i}',
-                                   disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed'),
-                                   placeholder=os.getenv('comment_prompt'))
+            other_categories = comment_storage[i].get('other_categories', [])
+            if os.getenv('category_9') in categories:
+                new_other_category = st.text_input(
+                    f"{os.getenv('specify_categories')}",
+                    key=f"new_other_category_{i}",
+                    disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')
+                )
+
+                if st.button(f"{os.getenv('add_category')}", key=f"add_other_category_{i}",
+                             disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')):
+                    if new_other_category.strip():
+                        other_categories.append(new_other_category.strip())
+                        comment_storage[i]['other_categories'] = other_categories
+
+                # Display existing "Other" categories with remove buttons
+                for j, other in enumerate(other_categories):
+                    col1, col2 = st.columns([5, 1])
+                    with col1:
+                        st.write(f"**{os.getenv('other_category')} {j + 1}**: {other}")
+                    with col2:
+                        if st.button(f"{os.getenv('remove')}", key=f"remove_other_{i}_{j}",
+                                     disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')):
+                            other_categories.pop(j)
+                            comment_storage[i]['other_categories'] = other_categories
+                            st.rerun()
+
+            else:
+                comment_storage[i]['other_categories'] = []
+
+            # Comment box and Enter button in the same column
+            comment = st.text_area(
+                f"{os.getenv('comments')} {i + 1}",
+                key=f'comment_{i}',
+                disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed'),
+                placeholder=os.getenv('comment_prompt')
+            )
             comment_storage[i]['comment'] = comment
 
-            if feedback_option == os.getenv('yes') and comment.strip() and categories:
+            # Place the Enter button directly below the text area
+            enter_button = st.button(
+                "Enter",
+                key=f"enter_button_{i}",
+                disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')
+            )
+
+            # A valid comment requires a text comment and at least one category (including 'Other' if specified)
+            if feedback_option == os.getenv('yes') and comment.strip() and (categories or other_categories):
                 valid_comments_count += 1
 
     # Update 'comments' session state with the modified comment storage
@@ -155,6 +221,7 @@ def comments():
 
     submit_button_disabled = valid_comments_count < 2
     done_button(submit_button_disabled)
+
 
 
 
@@ -169,6 +236,9 @@ def submit_user_input():
 
 # get input from the user and generate a response
 def get_input_and_gen_response():
+    if get_session_state('response_count') == maximum_responses:
+        return
+
     if not get_session_state('submitted_input'):
         user_input = submit_user_input()
         if user_input:
@@ -224,11 +294,18 @@ def text_received(text):
 
 def finish_button():
     response_count = get_session_state('response_count')
+
+    # Hide the finish button if the maximum number of responses is reached
+    if response_count >= maximum_responses:
+        set_session_state('survey_finished', True)
+        return  # Do not render the button
+
+    # Disable the finish button if the survey is already marked as finished
     if get_session_state('survey_finished'):
         st.button(os.getenv('finish_chat'), disabled=True)
         return
-    if response_count == maximum_responses:
-        set_session_state('survey_finished', True)
+
+    # Show the finish button only if the minimum number of responses has been met
     if response_count >= minimum_responses:
         if st.button(os.getenv('finish_chat')):
             set_session_state('survey_finished', True)

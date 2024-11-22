@@ -5,8 +5,6 @@ import requests
 import os
 import json
 
-minimum_responses = 1
-warning_responses = 10
 maximum_responses = 15
 
 DEEPINFRA_TOKEN = os.getenv('DEEPINFRA_TOKEN', st.secrets['llama_api_key'])
@@ -72,14 +70,25 @@ def request_response(user_input, system_instruction, callback):
     response = requests.post(url, headers=headers, json=data, stream=True)
     for line in response.iter_lines():
         if line:
-            stop = json.loads(line.decode('utf-8').strip('data: '))['choices'][0]['finish_reason']
-            if stop is None:
-                text = json.loads(line.decode('utf-8').strip('data: '))['choices'][0]['delta']['content']
-                callback(text)
-            else:
-                callback(None)
+            decoded_line = line.decode('utf-8').strip()
+
+            if decoded_line == '[DONE]':
                 break
 
+            try:
+                parsed_data = json.loads(decoded_line.strip('data: '))
+            except json.JSONDecodeError:
+                continue
+
+            if 'choices' in parsed_data and parsed_data['choices']:
+                stop = parsed_data['choices'][0].get('finish_reason')
+                if stop is None:
+                    text = parsed_data['choices'][0]['delta'].get('content', '')
+                    if text:
+                        callback(text)
+                else:
+                    callback(None)
+                    break
 
 # filter input before requesting from API
 def get_response(user_input, system_instruction, callback):

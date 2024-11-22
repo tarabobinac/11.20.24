@@ -10,16 +10,16 @@ def setup():
     os.environ['intro_system_instruction'] = 'Responda com uma lista de prós e contras sobre o tema em questão.'
     os.environ['intro_text'] = f'''Imagine que você é uma pessoa do Brasil moderando uma discussão sobre {os.environ['topic']}. Com base nos valores culturais do Brasil, forneça ao seu companheiro de comunicação argumentos sobre por que uma pessoa média do Brasil estaria a favor ou contra {os.environ['topic']}. Você deve fornecer informações em um estilo casual em português. Comece a conversa exatamente com o seguinte aviso:
 
-"Boa tarde. Serei seu companheiro de conversa hoje em uma breve discussão sobre {os.environ['topic']}. Esta discussão é uma oportunidade para você aprender sobre {os.environ['topic']} no Brasil. Quero encorajá-lo a falar livremente. Não se espera que você seja um especialista. Além disso, não é necessário chegar a um consenso, você não precisa concordar com as posturas que eu fornecer. Meu papel é te ajudar a aprender como as pessoas no Brasil percebem os prós e os contras d{os.environ['topic']}."
+"Boa tarde. Serei seu companheiro de conversa hoje em uma breve discussão sobre {os.environ['topic']}. Esta discussão é uma oportunidade para você aprender sobre {os.environ['topic']} no Brasil. Quero te encorajar a falar livremente. Não se espera que você seja um(a) especialista. Além disso, não é necessário chegarmos a um consenso, você não precisa concordar com as posturas que eu fornecer. Meu papel é te ajudar a aprender como as pessoas no Brasil percebem os prós e os contras d{os.environ['topic']}."
 
 E então forneça informações culturalmente relevantes em uma lista de prós e contras.
 
 Por último, incentive a conversa terminando com "Por favor, comece nos contando algo que você considera controverso sobre este tema."
 '''
     os.environ['gen_max_tokens'] = '512'
-    os.environ['gen_system_instruction'] = (f"""Termine a sua resposta dentro de {os.environ['gen_max_tokens']} tokens.
-                                            Evite perguntas de \"sim\"/\"não\".""")
-    os.environ['shorter_system_instruction'] = 'Use respostas curtas e casuais. Evite perguntas de \"sim\"/\"não\".'
+    os.environ['gen_system_instruction'] = (f"""Termine a sua resposta dentro de {os.environ['gen_max_tokens']} tokens. Não mude de assunto. Evite perguntas de \"sim\"/\"não\".""")
+    os.environ['shorter_system_instruction'] = 'Use respostas curtas e casuais. Não mude de assunto. Evite perguntas de \"sim\"/\"não\".'
+    os.environ['post_survey'] = 'https://uwmadison.co1.qualtrics.com/jfe/form/SV_4JwGwDzYgW6DTzU'
 
 # style
 def chat_bubble_css():

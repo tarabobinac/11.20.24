@@ -20,10 +20,10 @@ Luego comporte información culturalmente relevante en una lista de pros y contr
 Por último, fomente la conversación terminando con "Por favor, comience contándonos algo que encuentre controversial sobre este tema". 
 '''
     os.environ['gen_max_tokens'] = '512'
-    os.environ['gen_system_instruction'] = (f"""Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
-                                                Evite preguntas de \"sí\"/\"no\".""")
+    os.environ['gen_system_instruction'] = (f"""Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens. No cambies de tema. Evite preguntas de \"sí\"/\"no\".""")
     os.environ[
-        'shorter_system_instruction'] = "Proporciona respuestas más breves y casuales. Evite preguntas de \"sí\"/\"no\"."
+        'shorter_system_instruction'] = "Proporciona respuestas más breves y casuales. No cambies de tema. Evite preguntas de \"sí\"/\"no\"."
+    os.environ['post_survey'] = 'https://uwmadison.co1.qualtrics.com/jfe/form/SV_0ex38bSxVGfxFuC'
 
 # style
 def chat_bubble_css():

@@ -6,6 +6,7 @@ from utils.EN_labels import set_labels
 
 # configuration
 def setup():
+    os.environ['country'] = ''
     os.environ['topic'] = 'abortion'
 
     os.environ['intro_max_tokens'] = '512'
@@ -13,11 +14,12 @@ def setup():
     os.environ['intro_text'] = f"""Let’s talk about {os.environ['topic']}! Start off by telling me something that puzzles you about {os.environ['topic']}."""
 
     os.environ['gen_max_tokens'] = '512'
-    os.environ['gen_system_instruction'] = (f"""Engage in opinionated conversation on {os.environ['topic']}. You finish your response 
+    os.environ['gen_system_instruction'] = (f"""Engage in opinionated and stubborn conversation on {os.environ['topic']}. You finish your response 
                                             within {os.environ['gen_max_tokens']} tokens. Avoid asking \"yes\"/\"no\" 
                                             questions.""")
-    os.environ['shorter_system_instruction'] = (f"""Engage in opinionated conversation on {os.environ['topic']}. You provide shorter, 
+    os.environ['shorter_system_instruction'] = (f"""Engage in opinionated and stubborn conversation on {os.environ['topic']}. You provide shorter, 
                                             more conversational responses. Avoid asking \"yes\"/\"no\" questions.""")
+    os.environ['post_survey'] = 'https://uwmadison.co1.qualtrics.com/jfe/form/SV_3dTAvg2SnPonuMS'
 
 # style
 def chat_bubble_css():

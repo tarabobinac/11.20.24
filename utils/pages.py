@@ -14,17 +14,16 @@ def show_chat_page():
 
     intro_emoji = st.radio(
         os.getenv('react_intro'),
-        ["❤️", "😂", "😮", "😢", "😡", "👍", "👎"],
-        key="intro_reaction",
+        ["😄", "🙂", "😐", "🙁", "😡"],
+        key="intro_react",
         index=None,
         horizontal=True,
         disabled=get_session_state('intro_reaction') is not None and get_session_state('user_input') is not None
     )
 
-    if intro_emoji and get_session_state('intro_reaction') is None:
+    if intro_emoji and get_session_state('intro_reaction') != intro_emoji:
         set_session_state('intro_reaction', intro_emoji)
-        st.success("Thank you for reacting to the introduction!")
-        st.experimental_rerun()
+        st.rerun()
 
     if not get_session_state('intro_reaction'):
         st.warning(os.getenv('intro_emoji'))
@@ -52,16 +51,4 @@ def show_chat_page():
 def show_feedback_page():
     st.subheader(os.getenv('feedback_page'))
     st.write(os.getenv('comment_outline'))
-
-    with st.expander(os.getenv('categories')):
-        st.markdown("""
-        - **Balanced / biased towards certain perspective**: ...
-        - **Morally + ethically sound / morally + ethically questionable**: ...
-        - **Factually incorrect**: ...
-        - **Respectful / disrespectful**: ...
-        - **Culturally relevant / culturally irrelevant**: ...
-        - **Other**: Any other feedback that doesn't fit into the above categories.
-        <br><br>
-        """, unsafe_allow_html=True)
-
     comments()

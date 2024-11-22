@@ -6,16 +6,18 @@ from utils.ES_labels import set_labels
 
 # configuration
 def setup():
+    os.environ['country'] = ''
     os.environ['topic'] = 'los OGMs'
 
     os.environ['intro_max_tokens'] = '512'
     os.environ['intro_system_instruction'] = ''
     os.environ['intro_text'] = f"""¡Hablemos sobre los organismos modificados geneticamente (OGMs)! Primero, cuéntame algo que encuentres controversial sobre {os.environ['topic']}."""
     os.environ['gen_max_tokens'] = '512'
-    os.environ['gen_system_instruction'] = (f"""Participe en conversaciones que inviten a expresar opiniones. Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
+    os.environ['gen_system_instruction'] = (f"""Participe en conversaciones obstinadas y cargadas de opiniones sobre {os.environ['topic']}. Termina tu respuesta dentro de {os.environ['gen_max_tokens']} tokens."
                                                 Evite preguntas de \"sí\"/\"no\".""")
     os.environ[
-        'shorter_system_instruction'] = "Participe en conversaciones que inviten a expresar opiniones. Proporciona respuestas más breves y casuales. Evite preguntas de \"sí\"/\"no\"."
+        'shorter_system_instruction'] = f"""Participe en conversaciones obstinadas y cargadas de opiniones sobre {os.environ['topic']}. Proporciona respuestas más breves y casuales. Evite preguntas de \"sí\"/\"no\"."""
+    os.environ['post_survey'] = 'https://uwmadison.co1.qualtrics.com/jfe/form/SV_a5IN1x99Js58ofA'
 
 # style
 def chat_bubble_css():

@@ -19,10 +19,9 @@ And then provide relevant cultural information in a pros/cons list.
 Lastly, encourage conversation by ending with \"Please start off by telling us something that puzzles you about this topic.\"
 """
     os.environ['gen_max_tokens'] = '512'
-    os.environ['gen_system_instruction'] = (f"""You finish your response within {os.environ['gen_max_tokens']} tokens.
-                                            Avoid asking \"yes\"/\"no\" questions.""")
-    os.environ['shorter_system_instruction'] = (f"""You provide shorter, more conversational responses. Avoid asking 
-                                            \"yes\"/\"no\" questions.""")
+    os.environ['gen_system_instruction'] = (f"""You finish your response within {os.environ['gen_max_tokens']} tokens. Do not change topics. Avoid asking \"yes\"/\"no\" questions.""")
+    os.environ['shorter_system_instruction'] = (f"""You provide shorter, more conversational responses. Do not change topics. Avoid asking \"yes\"/\"no\" questions.""")
+    os.environ['post_survey'] = 'https://uwmadison.co1.qualtrics.com/jfe/form/SV_3dTAvg2SnPonuMS'
 
 # style
 def chat_bubble_css():

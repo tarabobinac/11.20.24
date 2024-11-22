@@ -22,6 +22,8 @@ def insert_data_to_db(data):
 # Submission handler
 def handle_submission():
     data = {
+        "country": os.getenv('country'),
+        "topic": os.getenv('topic'),
         "id": get_session_state('respondent_id'),
         "system_instruction": get_session_state("system_instruction"),
         "shorter_system_instruction": get_session_state("shorter_system_instruction"),
