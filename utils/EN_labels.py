@@ -8,6 +8,7 @@ def set_labels():
     os.environ['intro_wait'] = 'Launching chatbot, this can take up to 20 seconds...'
     os.environ['react_intro'] = 'React to the introduction:'
     os.environ['intro_emoji'] = 'Select an emoji to continue chatting.'
+    os.environ['enter_button'] = 'Enter'
     os.environ['you'] = 'You'
     os.environ['enter'] = 'Press Enter to send'
     os.environ['emoji_prompt'] = 'React to response'
