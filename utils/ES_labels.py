@@ -46,6 +46,7 @@ def set_labels():
     os.environ['category_8'] = 'no abierto a escuchar al usuario'
     os.environ['category_9'] = 'Otro'
     os.environ['other_category'] = 'Otra categoría'
+    os.environ['post_survey_message'] = 'Ir a la encuesta posterior'
     os.environ[
         'chat_complete'] = "**Chat finalizado.** ¡Gracias por interactuar con el chatbot! A veces, los chatbots generan respuestas inexactas. Presione **Siguiente página** para revisar las respuestas del chatbot y proporcionar comentarios sobre ellas."
     os.environ['comment_outline'] = """
