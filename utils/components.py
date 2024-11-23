@@ -183,7 +183,7 @@ def comments():
 
                 # Display existing "Other" categories with remove buttons
                 for j, other in enumerate(other_categories):
-                    col1, col2 = st.columns([5, 1])
+                    col1, col2 = st.columns([4, 1])
                     with col1:
                         st.write(f"**{os.getenv('other_category')} {j + 1}**: {other}")
                     with col2:
@@ -207,7 +207,7 @@ def comments():
 
             # Place the Enter button directly below the text area
             enter_button = st.button(
-                "Enter",
+                f'''{os.getenv('enter_button')}''',
                 key=f"enter_button_{i}",
                 disabled=feedback_option != os.getenv('yes') or get_session_state('done_pressed')
             )
