@@ -7,7 +7,7 @@ from utils.EN_labels import set_labels
 # configuration
 def setup():
     os.environ['country'] = 'Nicaragua'
-    os.environ['topic'] = 'gun control'
+    os.environ['topic'] = 'the death penalty'
     os.environ['intro_max_tokens'] = '512'
     os.environ['intro_system_instruction'] = 'Respond with a list of pros and cons on the topic at hand.'
     os.environ['intro_text'] = f"""Imagine you are a person from {os.environ['country']} moderating a discussion about {os.environ['topic']}. Based on the cultural values from {os.environ['country']}, provide your communication partner with stances why an average person from {os.environ['country']} would be pro/against {os.environ['topic']}. You should provide information in a casual style in English. Start the conversation with exactly the following prompt: 
