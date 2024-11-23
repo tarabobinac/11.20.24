@@ -11,6 +11,7 @@ def set_labels():
     os.environ['intro_emoji'] = 'Seleccione un emoji para seguir chateando.'
     os.environ['you'] = 'Usted'
     os.environ['enter'] = 'Presione Enter para enviar'
+    os.environ['enter_button'] = 'Enviar'
     os.environ['emoji_prompt'] = 'Reaccione a la respuesta'
     os.environ['finish_chat'] = 'Finalizar chat'
     os.environ['next_page'] = 'Siguiente página'
