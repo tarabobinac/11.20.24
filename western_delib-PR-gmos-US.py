@@ -5,6 +5,7 @@ from utils.pages import show_chat_page, show_feedback_page
 from utils.PR_labels import set_labels
 
 def setup():
+    os.environ['country'] = 'os Estados Unidos'
     os.environ['topic'] = 'os OGMs'
     os.environ['intro_max_tokens'] = '512'
     os.environ['intro_system_instruction'] = 'Responda com uma lista de prós e contras sobre o tema em questão.'
