@@ -46,6 +46,7 @@ def set_labels():
     os.environ['remove'] = 'Remover'
     os.environ['specify_categories'] = 'Especificar categoria:'
     os.environ['add_category'] = 'Adicionar categoria'
+    os.environ['post_survey_message'] = 'Ir para a enquete'
     os.environ[
         'chat_complete'] = "**Chat finalizado**, obrigado por conversar com o chatbot! Às vezes, os chatbots geram respostas que são imprecisas de diversas maneiras. Pressione **Próxima página** para revisar as respostas do chatbot deste chat e fornecer feedback sobre elas."
     os.environ['comment_outline'] = """
