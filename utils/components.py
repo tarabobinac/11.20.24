@@ -62,7 +62,7 @@ def done_button(submit_button_disabled):
             <div class="survey-button">
                 <a href="{link}" target="_blank">
                     <button style="padding: 10px 20px; font-size: 16px; background-color: #027148; color: #f1f0f0; border: none; border-radius: 5px; cursor: pointer;">
-                        Go to Post Survey
+                        {os.getenv('post_survey_message')}
                     </button>
                 </a>
             </div>
