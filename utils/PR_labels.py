@@ -59,7 +59,7 @@ def set_labels():
 
                     Se você decidir dar feedback sobre uma resposta, pode especificar o tipo escolhendo entre as categorias no menu suspenso. Você pode escolher mais de uma. Em seguida, preencha a caixa de comentários com suas considerações sobre a resposta.
 
-                    **Você deve fornecer feedback para pelo menos duas respostas**, momento em que o botão **Enviar** será habilitado.
+                    **Você deve fornecer feedback para pelo menos duas respostas, selecionando pelo menos uma categoria e escrevendo um comentário para cada uma**, momento em que o botão **Enviar** será habilitado.
 
                     Clique em **Enviar** quando terminar, depois clique em **Ir para a enquete** para começar a enquete.
                     """
