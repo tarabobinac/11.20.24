@@ -59,7 +59,7 @@ def set_labels():
 
                 Si desea hacer comentarios sobre una respuesta, puede especificar el tipo de comentarios eligiendo entre las categorías del menú desplegable. Puede elegir más de un tipo de comentario. Luego, complete la casilla de comentarios con su opinión sobre la respuesta.
 
-                **Debe proporcionar comentarios para al menos dos respuestas del chatbot**. Luego de completar el mínimo de dos respuestas, el botón **Enviar** estará habilitado. 
+                **Debe proporcionar comentarios para al menos dos respuestas del chatbot, seleccionando al menos una categoría y escribiendo un comentario para cada una**. Luego de completar el mínimo de dos respuestas, el botón **Enviar** estará habilitado. 
 
                 Haga clic en **Enviar** cuando haya terminado, luego haga clic en **Ir a la encuesta posterior** para realizar la encuesta posterior.
                 """
