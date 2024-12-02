@@ -60,6 +60,7 @@ st.set_page_config(
 
 # start session and display chat or response page
 def main():
+    set_labels()
     setup()
     session_setup()
     chat_bubble_css()
