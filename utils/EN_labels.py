@@ -59,7 +59,7 @@ def set_labels():
         If you choose to provide feedback on a response, you can specify the type by choosing from the categories in the 
         dropdown menu. You can choose more than one. Then, fill out the comment box with your thoughts on the response.
 
-        **You must provide feedback (positive, negative, or neutral) for at least two responses by selecting at least one category and writing a comment for each**, at which point a **Submit** button will appear at the bottom
+        **You must provide feedback (positive, negative, or neutral) for at least three responses by selecting at least one category and writing a comment for each**, at which point a **Submit** button will appear at the bottom
         of the page.
 
         Click **Submit** when you are finished, then click **Go to post-survey** to take the post-survey.
