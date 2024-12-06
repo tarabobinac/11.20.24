@@ -57,13 +57,20 @@ def request_response(user_input, system_instruction, callback):
         ]
     )
 
+    if os.getenv('country') == '':
+        temperature = 0.7
+        repetition_penalty = 1
+    else:
+        temperature = 0.8
+        repetition_penalty = 1.2
+    
     data = {
         'model': 'meta-llama/Meta-Llama-3.1-70B-Instruct',
         'messages': messages,
-        'temperature': 0.8,
+        'temperature': temperature,
         'stream': 'true',
         'top_p': 0.9,
-        'repetition_penalty': 1.2,
+        'repetition_penalty': repetition_penalty,
         'max_tokens': os.getenv('gen_max_tokens')
     }
 
