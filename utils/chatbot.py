@@ -60,10 +60,10 @@ def request_response(user_input, system_instruction, callback):
     data = {
         'model': 'meta-llama/Meta-Llama-3.1-70B-Instruct',
         'messages': messages,
-        'temperature': 0.7,
+        'temperature': 0.8,
         'stream': 'true',
         'top_p': 0.9,
-        'repetition_penalty': 1,
+        'repetition_penalty': 1.2,
         'max_tokens': os.getenv('gen_max_tokens')
     }
 
