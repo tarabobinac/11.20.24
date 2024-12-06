@@ -219,7 +219,7 @@ def comments():
     # Update 'comments' session state with the modified comment storage
     set_session_state('comments', comment_storage)
 
-    submit_button_disabled = valid_comments_count < 2
+    submit_button_disabled = valid_comments_count < 3
     done_button(submit_button_disabled)
 
 
