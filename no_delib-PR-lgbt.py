@@ -9,7 +9,7 @@ def setup():
     os.environ['topic'] = 'os direitos LGBTQ'
     os.environ['intro_max_tokens'] = '512'
 
-    os.environ['intro_system_instruction'] = 'Responda com uma lista de prós e contras sobre o tema em questão.'
+    os.environ['intro_system_instruction'] = ''
     os.environ['intro_text'] = f"""Vamos falar sobre {os.environ['topic']}! Comece nos contando algo que te confunde sobre {os.environ['topic']}."""
 
     os.environ['gen_max_tokens'] = '512'
